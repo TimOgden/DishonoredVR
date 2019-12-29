@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class GuardDetection : MonoBehaviour {
-	public static float visualCheckFrequency = 2f; // How often should all the guards raycast out
+	public static float visualCheckFrequency = .2f; // How often should all the guards raycast out
 	public float viewAngle = 100;
 	public float alertnessLevel = 0f;
 	public float alertnessSpeed = 1f;
@@ -12,6 +12,8 @@ public class GuardDetection : MonoBehaviour {
 	private Transform player;
 	public Transform eyes;
 	private Transform raycastTargets;
+	public bool playerInSight = false;
+	public Slider slider;
 	// Use this for initialization
 	void Start () {
 		player = GameObject.Find("Corvo").transform;
@@ -21,11 +23,25 @@ public class GuardDetection : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if(!playerInSight) {
+			if(alertnessLevel < .5f) {
+
+			}
+		}
 	}
 
-	void OnTriggerStay(Collider other) {
-		if(other.tag=="Player") {
+	void OnTriggerEnter(Collider other) {
+		if(other.tag=="Player")
+			StartCoroutine(CheckForPlayer(other));
+	}
+
+	void OnTriggerExit(Collider other) {
+		if(other.tag=="Player")
+			StartCoroutine(CheckForPlayer(other));
+	}
+
+	IEnumerator CheckForPlayer(Collider other) {
+		while(true) {
 			Vector3 direction = other.transform.position - eyes.position;
 			float angle = Vector3.Angle(eyes.forward, direction);
 			if(angle <= viewAngle / 2f) {
@@ -46,12 +62,21 @@ public class GuardDetection : MonoBehaviour {
 					}
 				}
 				float dist = Vector3.Distance(other.transform.position, eyes.position);
-				alertnessLevel += Time.deltaTime * alertnessSpeed
-									+ numTargetsSighted * numTimesSightedMultiplier
-									+ (1/dist) * closenessMultiplier;
-				alertnessLevel = Mathf.Min(alertnessLevel,1);
-				Debug.Log(alertnessLevel);
+				if(numTargetsSighted>0) {
+					playerInSight = true;
+					alertnessLevel += visualCheckFrequency * alertnessSpeed
+										+ numTargetsSighted * numTimesSightedMultiplier
+										+ (1/Mathf.Pow(dist,2)) * closenessMultiplier;
+					alertnessLevel = Mathf.Min(alertnessLevel,1);
+					slider.value = alertnessLevel;
+				} else {
+					playerInSight = false;
+				}
+			} else {
+				playerInSight = false;
 			}
+			yield return new WaitForSeconds(visualCheckFrequency);
 		}
+		
 	}
 }

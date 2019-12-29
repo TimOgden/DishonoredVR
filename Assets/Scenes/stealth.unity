@@ -131,10 +131,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewAngle: 150
   alertnessLevel: 0
-  alertnessSpeed: 0.1
+  alertnessSpeed: 0.3
   numTimesSightedMultiplier: 0
-  closenessMultiplier: 0
+  closenessMultiplier: 0.65
   eyes: {fileID: 1172760847}
+  playerInSight: 0
+  slider: {fileID: 1640777096}
 --- !u!135 &16138672
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -531,7 +533,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -716,7 +718,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 2422a0d7823a20842b56b7c0527f5942, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a762e1f4b13d588499095f1c0a08a683, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
