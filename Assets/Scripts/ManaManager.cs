@@ -12,6 +12,7 @@ public class ManaManager : MonoBehaviour {
 	public float regencooldownLength;
 	private bool canCast = true;
 	private bool canRegen = true;
+	public bool freezeRegen = false;
 	// Use this for initialization
 	void Start () {
 		
@@ -39,7 +40,7 @@ public class ManaManager : MonoBehaviour {
 	}
 
 	public void Regenerate(Power power) {
-		if(currentMana.value < maxRegen.value && canRegen) {
+		if(currentMana.value < maxRegen.value && canRegen && !freezeRegen) {
 			currentMana.value += Time.deltaTime * regenSpeed;
 		}
 	}

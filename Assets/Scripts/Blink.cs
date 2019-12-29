@@ -39,6 +39,7 @@ public class Blink : Power {
 				Debug.DrawRay(transform.position, transform.forward * maxDistance, Color.green);
 				blink_top.position = hit.point;
 				if(isClimbable(out hit)) {
+					top_rend.enabled = true;
 					if(hit.collider.tag == "Climbable") {
 						bottom_rend.enabled = false;
 						ConnectBlinkSpheres.SetActive(false);
@@ -96,8 +97,11 @@ public class Blink : Power {
 					//Get distance from ground
 					RaycastHit aboveHit;
 					Physics.Raycast(blink_top.position, -Vector3.up, out aboveHit, 1000, layer_mask);
+					float fixed_y = blink_top.position.y;
+					if(fixed_y - aboveHit.point.y <= 1.2f)
+						fixed_y = aboveHit.point.y + 1.2f;
 					Vector3 blinkpos_ycorrected = new Vector3(blink_top.position.x, 
-							aboveHit.point.y+1f, blink_top.position.z);
+							fixed_y, blink_top.position.z);
 					if(hit.distance < 1) {
 						//player.position = blinkpos_ycorrected;
 						StartCoroutine(GoToBlink(blinkpos_ycorrected, blinkTime));
@@ -143,12 +147,15 @@ public class Blink : Power {
 		while(true) {
 			if(!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A)
 					&& !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.D)
+					&& !Input.GetKey(KeyCode.Space)
 					&& Input.GetButton(powersButton)) {
 				cc.enabled = false;
 				frozenTimePanel.enabled = true;
+				mana.freezeRegen = true;
 			} else {
 				cc.enabled = true;
 				frozenTimePanel.enabled = false;
+				mana.freezeRegen = false;
 			}
 			yield return new WaitForSeconds(.1f);
 		}
