@@ -5,29 +5,27 @@ using UnityEngine.UI;
 public class GuardDetection : MonoBehaviour {
 	public static float visualCheckFrequency = .2f; // How often should all the guards raycast out
 	public float viewAngle = 100;
-	public float alertnessLevel = 0f;
 	public float alertnessSpeed = 1f;
+	public float deescalationSpeed = .5f;
 	public float numTimesSightedMultiplier = 1f;
 	public float closenessMultiplier = 1f;
 	private Transform player;
 	public Transform eyes;
 	private Transform raycastTargets;
+	public AlertnessMeter alertness;
 	public bool playerInSight = false;
-	public Slider slider;
+	private Transform markers;
+	private Vector3 lastSighting;
 	// Use this for initialization
 	void Start () {
 		player = GameObject.Find("Corvo").transform;
 		raycastTargets = player.Find("RaycastTargets");
-
+		markers = GameObject.Find("AwarenessMarkers").transform;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(!playerInSight) {
-			if(alertnessLevel < .5f) {
-
-			}
-		}
+		
 	}
 
 	void OnTriggerEnter(Collider other) {
@@ -37,7 +35,7 @@ public class GuardDetection : MonoBehaviour {
 
 	void OnTriggerExit(Collider other) {
 		if(other.tag=="Player")
-			StartCoroutine(CheckForPlayer(other));
+			StopCoroutine(CheckForPlayer(other));
 	}
 
 	IEnumerator CheckForPlayer(Collider other) {
@@ -64,19 +62,27 @@ public class GuardDetection : MonoBehaviour {
 				float dist = Vector3.Distance(other.transform.position, eyes.position);
 				if(numTargetsSighted>0) {
 					playerInSight = true;
-					alertnessLevel += visualCheckFrequency * alertnessSpeed
-										+ numTargetsSighted * numTimesSightedMultiplier
-										+ (1/Mathf.Pow(dist,2)) * closenessMultiplier;
-					alertnessLevel = Mathf.Min(alertnessLevel,1);
-					slider.value = alertnessLevel;
+					float speedFactor = visualCheckFrequency * alertnessSpeed;
+					float targetsFactor = numTargetsSighted * numTimesSightedMultiplier;
+					float distFactor = (1/Mathf.Pow(dist,2)) * closenessMultiplier;
+					alertness.AddAlertness(speedFactor + targetsFactor + distFactor);
+					//Debug.Log("Speed:" + speedFactor + "Targets:" + targetsFactor + "Dist:" + distFactor);
+					alertness.UpdateAlertness();
 				} else {
 					playerInSight = false;
 				}
 			} else {
 				playerInSight = false;
 			}
+			/*if(!playerInSight ) {
+				if(alertness.GetAlertness() <= 1f)
+					alertness.AddAlertness(-deescalationSpeed * visualCheckFrequency);
+
+			}*/
 			yield return new WaitForSeconds(visualCheckFrequency);
 		}
 		
 	}
+
+
 }
